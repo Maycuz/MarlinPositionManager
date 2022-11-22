@@ -8,17 +8,9 @@ namespace PrinterPositionManager
 {
     internal class GcodeParser
     {
-        public GcodeParser()
-        {
-
-        }
-
         public StoredPosition? ParseData(string serialData)
         {
-            // X:-19.00 Y:347.00 Z:326.03
-
             // TODO: Verify received message is OK
-
             StoredPosition? storedPos = null;
 
             try

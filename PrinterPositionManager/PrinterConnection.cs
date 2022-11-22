@@ -8,20 +8,12 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace PrinterPositionManager
 {
-    internal class PrinterConnection
+    internal class MarlinPrinter
     {
         private bool _isConnected = false;
         private SerialPort _port;
         private GcodeParser _parser;
         private StoredPosition? _currentPos;
-
-        public struct NewPositionReceivedEventArgs
-        {
-            public NewPositionReceivedEventArgs(StoredPosition storedPos) { storedPosition = storedPos; }
-            public StoredPosition storedPosition { get; }
-        }
-
-        public delegate void OnNewPositionReceivedEventHandler(object sender, NewPositionReceivedEventArgs e);
 
         public static List<string> AvailableBaudrates = new List<string>
         {
@@ -38,7 +30,7 @@ namespace PrinterPositionManager
             "192000"
         };
 
-        public PrinterConnection(string serialPort, int baudrate)
+        public MarlinPrinter(string serialPort, int baudrate)
         {
             _port = new SerialPort(serialPort, baudrate);
             _parser = new GcodeParser();
@@ -71,14 +63,10 @@ namespace PrinterPositionManager
         {
             var data = _port.ReadExisting();
             
-            // TODO: for debug purposes
-            // Console.Write(data);
-
             var parsedData = _parser.ParseData(data);
 
             if (parsedData != null)
                 _currentPos = parsedData;
-                // newPositionEvent?.Invoke(this, new NewPositionReceivedEventArgs(parsedData));
         }
 
         public void Disconnect()

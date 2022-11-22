@@ -12,9 +12,6 @@ namespace PrinterPositionManager
 {
     public partial class Form1 : Form
     {
-        private StoredPosition? currentPosition;
-        private string storedPositionsFile = Directory.GetCurrentDirectory() + "\\stored_positions.xml";
-
         private enum UIState
         {
             CONNECTED,
@@ -22,28 +19,30 @@ namespace PrinterPositionManager
             ERROR
         }
 
-        private PrinterConnection? _printerConnection;
+        private StoredPosition? _currentPosition;
+        private MarlinPrinter? _printerConnection;
+        private readonly string _storedPositionsFile = Directory.GetCurrentDirectory() + "\\stored_positions.xml";
 
         public Form1()
         {
             InitializeComponent();
 
-            // Attempt...
+            // Assure decimal notations are compliant with Marlin (dot rather than comma).
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-GB");
 
             var availablePorts = SerialPort.GetPortNames();
 
             cbxComPort.Items.AddRange(availablePorts);
-            cbxBaudrate.Items.AddRange(PrinterConnection.AvailableBaudrates.ToArray());
+            cbxBaudrate.Items.AddRange(MarlinPrinter.AvailableBaudrates.ToArray());
             
             if(availablePorts.Length > 0)
                 cbxComPort.SelectedIndex = 0;
 
             cbxBaudrate.SelectedIndex = 
-                PrinterConnection.AvailableBaudrates.FindIndex(a => a == ("115200"));
+                MarlinPrinter.AvailableBaudrates.FindIndex(a => a == ("115200"));
 
-            if (File.Exists(storedPositionsFile))
-                LoadFromXML(storedPositionsFile);
+            if (File.Exists(_storedPositionsFile))
+                LoadFromXML(_storedPositionsFile);
 
             SetUIState(UIState.DISCONNECTED);
         }
@@ -51,14 +50,18 @@ namespace PrinterPositionManager
         private void btPrinterConn_Click(object sender, EventArgs e)
         {
             // TODO: Must be a safer way to do this...
-            _printerConnection = new PrinterConnection((string)cbxComPort.SelectedItem,
+            _printerConnection = new MarlinPrinter((string)cbxComPort.SelectedItem,
                 int.Parse((string)cbxBaudrate.SelectedItem));
-            _printerConnection.Connect();
+            
+            if(!_printerConnection.Connect())
+            {
+                MessageBox.Show("Error connecting to printer", "Connection error");
+            }
 
             // Should be connected, so consider it an error
             SetPrinterConnectionUI(_printerConnection.IsConnected, true);           
         }
-        private void SetPrinterConnectionUI(bool connected, bool isError)
+        private void SetPrinterConnectionUI(bool connected, bool isDisconnectUnexpected)
         {
             if (connected)
             {
@@ -66,7 +69,7 @@ namespace PrinterPositionManager
                 SetUIState(UIState.CONNECTED);
                 posRequest.Start();
             }
-            else if (!isError)
+            else if (!isDisconnectUnexpected)
             {
                 tbPrinterStatus.Text = "Disconnected";
                 SetUIState(UIState.DISCONNECTED);
@@ -140,7 +143,7 @@ namespace PrinterPositionManager
             if (_printerConnection == null)
             {
                 MessageBox.Show("Error", "Check printer connection");
-                posRequest.Stop();
+                SetPrinterConnectionUI(false, false);
                 return;
             }
 
@@ -151,17 +154,17 @@ namespace PrinterPositionManager
             if (currentPos != null)
             {
                 tbCurrentPosVal.Text = currentPos.ToString();
-                currentPosition = currentPos;
+                _currentPosition = currentPos;
             }
         }
 
         private void btStore_Click(object sender, EventArgs e)
         {
-            if (currentPosition != null)
+            if (_currentPosition != null)
             {
-                var currentPos = new StoredPosition(currentPosition.Position);
+                var currentPos = new StoredPosition(_currentPosition.Position);
                 lbxStored.Items.Add(currentPos);
-                SaveStoredToXml(storedPositionsFile);
+                SaveStoredToXml(_storedPositionsFile);
             }
         }
 
@@ -197,21 +200,21 @@ namespace PrinterPositionManager
             storedPos.Position = newPos;
 
             lbxStored.Items[lbxStored.SelectedIndex] = storedPos;
-            SaveStoredToXml(storedPositionsFile);
+            SaveStoredToXml(_storedPositionsFile);
         }
 
         private void btRemove_Click(object sender, EventArgs e)
         {
             lbxStored.Items.RemoveAt(lbxStored.SelectedIndex);
-            SaveStoredToXml(storedPositionsFile);
+            SaveStoredToXml(_storedPositionsFile);
         }
 
         private void btRecallPos_Click(object sender, EventArgs e)
         {
             if (_printerConnection == null)
             {
-                posRequest.Stop();
                 MessageBox.Show("Error", "Check printer connection");
+                SetPrinterConnectionUI(false, false);
                 return;
             }
 
@@ -235,7 +238,7 @@ namespace PrinterPositionManager
             // checks to make sure only 1 decimal or - is allowed
             if (e.KeyChar == 46 || e.KeyChar == 45)
             {
-                if ((sender as System.Windows.Forms.TextBox).Text.IndexOf(e.KeyChar) != -1)
+                if (((System.Windows.Forms.TextBox)sender).Text.IndexOf(e.KeyChar) != -1)
                     e.Handled = true;
             }
         }
