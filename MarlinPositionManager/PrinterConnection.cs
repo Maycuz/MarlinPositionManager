@@ -7,9 +7,8 @@ namespace MarlinPositionManager
     {
         private bool _isConnected = false;
         private readonly SerialPort _port;
-        private StoredPosition? _currentPos;
 
-        public static List<int> AvailableBaudrates = new List<int>
+        public static List<int> AvailableBaudrates = new()
         {
             1200,
             2400,
@@ -29,10 +28,7 @@ namespace MarlinPositionManager
             _port = new SerialPort(serialPort, baudrate);
         }
 
-        public StoredPosition? CurrentPos
-        {
-            get { return _currentPos; }
-        }
+        public StoredPosition? CurrentPos { get; private set; }
 
         public bool Connect()
         {
@@ -59,7 +55,7 @@ namespace MarlinPositionManager
             var parsedData = GcodeParser.SerialDataToPosition(data);
 
             if (parsedData != null)
-                _currentPos = new StoredPosition((Vector3)parsedData);
+                CurrentPos = new StoredPosition((Vector3)parsedData);
         }
 
         public void Disconnect()

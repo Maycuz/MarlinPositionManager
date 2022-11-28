@@ -35,8 +35,7 @@ namespace MarlinPositionManager
 
         public static string PositionToSerialData(Vector3 position)
         {
-            var command = string.Format("G1 X{0} Y{1} Z{2}", position.X, position.Y, position.Z);
-            return command;
+            return string.Format("G1 X{0} Y{1} Z{2}", position.X, position.Y, position.Z);
         }
 
         public static string PositionRequest()
