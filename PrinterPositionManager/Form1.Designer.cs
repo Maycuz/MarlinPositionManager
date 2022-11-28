@@ -332,7 +332,6 @@
             this.MinimumSize = new System.Drawing.Size(402, 352);
             this.Name = "Form1";
             this.Text = "Marlin Position Manager";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.gbPositions.ResumeLayout(false);
             this.gbPositions.PerformLayout();
             this.gbConnection.ResumeLayout(false);

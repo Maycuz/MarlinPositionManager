@@ -1,39 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+﻿using System.IO.Ports;
+using System.Numerics;
 
 namespace PrinterPositionManager
 {
     internal class MarlinPrinter
     {
         private bool _isConnected = false;
-        private SerialPort _port;
-        private GcodeParser _parser;
+        private readonly SerialPort _port;
         private StoredPosition? _currentPos;
 
-        public static List<string> AvailableBaudrates = new List<string>
+        public static List<int> AvailableBaudrates = new List<int>
         {
-            "1200",
-            "2400",
-            "4800",
-            "9600",
-            "14400",
-            "19200",
-            "38400",
-            "57600",
-            "115200",
-            "128000",
-            "192000"
+            1200,
+            2400,
+            4800,
+            9600,
+            14400,
+            19200,
+            38400,
+            57600,
+            115200,
+            128000,
+            192000
         };
 
         public MarlinPrinter(string serialPort, int baudrate)
         {
             _port = new SerialPort(serialPort, baudrate);
-            _parser = new GcodeParser();
         }
 
         public StoredPosition? CurrentPos
@@ -63,10 +56,10 @@ namespace PrinterPositionManager
         {
             var data = _port.ReadExisting();
             
-            var parsedData = _parser.ParseData(data);
+            var parsedData = GcodeParser.SerialDataToPosition(data);
 
             if (parsedData != null)
-                _currentPos = parsedData;
+                _currentPos = new StoredPosition((Vector3)parsedData);
         }
 
         public void Disconnect()
@@ -89,7 +82,7 @@ namespace PrinterPositionManager
         {
             if (IsConnected)
             {
-                _port.WriteLine("M114");
+                _port.WriteLine(GcodeParser.PositionRequest());
             }
         }
 
@@ -97,8 +90,7 @@ namespace PrinterPositionManager
         {
             if (IsConnected)
             {
-                var command = String.Format("G1 X{0} Y{1} Z{2}", pos.Position.X, pos.Position.Y, pos.Position.Z);
-                _port.WriteLine(command);
+                _port.WriteLine(GcodeParser.PositionToSerialData(pos.Position));
             }
         }
     }

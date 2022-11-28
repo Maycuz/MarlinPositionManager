@@ -13,10 +13,8 @@ namespace PrinterPositionManager
         private Vector3 _position;
         private String? _alias;
 
-        public StoredPosition()
-        {
-
-        }
+        // Required for XML serialization
+        public StoredPosition() { }
 
         public StoredPosition(Vector3 position, String? alias = null)
         {
