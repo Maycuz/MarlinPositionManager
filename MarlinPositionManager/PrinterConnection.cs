@@ -1,7 +1,7 @@
 ﻿using System.IO.Ports;
 using System.Numerics;
 
-namespace PrinterPositionManager
+namespace MarlinPositionManager
 {
     internal class MarlinPrinter
     {
@@ -43,7 +43,7 @@ namespace PrinterPositionManager
 
                 _port.DataReceived += DataReceived;
             }
-            catch(UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException e)
             {
                 // TODO: Better exception handling & recovery
                 Console.WriteLine("Could not connect: {}", e.Message);
@@ -55,7 +55,7 @@ namespace PrinterPositionManager
         private void DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             var data = _port.ReadExisting();
-            
+
             var parsedData = GcodeParser.SerialDataToPosition(data);
 
             if (parsedData != null)

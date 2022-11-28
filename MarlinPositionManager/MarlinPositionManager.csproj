@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <StartupObject>PrinterPositionManager.Program</StartupObject>
+    <StartupObject>MarlinPositionManager.Program</StartupObject>
     <ApplicationIcon>Icons8-Windows-8-Printing-Cnc-Machine.ico</ApplicationIcon>
   </PropertyGroup>
 

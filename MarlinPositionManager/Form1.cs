@@ -7,9 +7,8 @@ using static System.Windows.Forms.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Serialization;
 using System.Xml;
-using MarlinPositionManager;
 
-namespace PrinterPositionManager
+namespace MarlinPositionManager
 {
     public partial class Form1 : Form
     {

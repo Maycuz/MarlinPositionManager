@@ -5,22 +5,22 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PrinterPositionManager
+namespace MarlinPositionManager
 {
     [Serializable]
     public class StoredPosition
     {
         private Vector3 _position;
-        private String? _alias;
+        private string? _alias;
 
         // Required for XML serialization
         public StoredPosition() { }
 
-        public StoredPosition(Vector3 position, String? alias = null)
+        public StoredPosition(Vector3 position, string? alias = null)
         {
             _position = position;
 
-            if (!String.IsNullOrEmpty(alias))
+            if (!string.IsNullOrEmpty(alias))
                 _alias = alias;
         }
 
@@ -30,7 +30,7 @@ namespace PrinterPositionManager
             get { return _position; }
         }
 
-        public String? Alias
+        public string? Alias
         {
             set { _alias = value; }
             get { return _alias; }
@@ -38,10 +38,10 @@ namespace PrinterPositionManager
 
         public override string ToString()
         {
-            if (_alias != null && !String.IsNullOrEmpty(_alias))
+            if (_alias != null && !string.IsNullOrEmpty(_alias))
                 return _alias;
 
-            return String.Format("X: {0:0.00}, Y: {1:0.00}, Z: {2:0.00}", _position.X, _position.Y, _position.Z);
+            return string.Format("X: {0:0.00}, Y: {1:0.00}, Z: {2:0.00}", _position.X, _position.Y, _position.Z);
         }
     }
 }

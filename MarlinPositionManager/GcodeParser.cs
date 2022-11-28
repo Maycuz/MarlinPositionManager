@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace PrinterPositionManager
+namespace MarlinPositionManager
 {
     internal static class GcodeParser
     {
@@ -17,15 +17,15 @@ namespace PrinterPositionManager
 
                 pos = new Vector3(float.Parse(x), float.Parse(y), float.Parse(z));
             }
-            catch (System.FormatException)
+            catch (FormatException)
             {
                 // Ignore
             }
-            catch (System.ArgumentOutOfRangeException)
+            catch (ArgumentOutOfRangeException)
             {
                 // Ignore
             }
-            catch (System.IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 // Ignore
             }
@@ -35,7 +35,7 @@ namespace PrinterPositionManager
 
         public static string PositionToSerialData(Vector3 position)
         {
-            var command = String.Format("G1 X{0} Y{1} Z{2}", position.X, position.Y, position.Z);
+            var command = string.Format("G1 X{0} Y{1} Z{2}", position.X, position.Y, position.Z);
             return command;
         }
 

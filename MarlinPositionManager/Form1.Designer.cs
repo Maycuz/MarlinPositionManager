@@ -1,4 +1,4 @@
-﻿namespace PrinterPositionManager
+﻿namespace MarlinPositionManager
 {
     partial class Form1
     {

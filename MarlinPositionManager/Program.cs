@@ -1,4 +1,4 @@
-namespace PrinterPositionManager
+namespace MarlinPositionManager
 {
     internal static class Program
     {

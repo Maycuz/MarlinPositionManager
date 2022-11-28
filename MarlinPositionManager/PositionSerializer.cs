@@ -1,7 +1,5 @@
 ﻿using System.Xml.Serialization;
 
-using PrinterPositionManager;
-
 namespace MarlinPositionManager
 {
     internal static class PositionSerializer
